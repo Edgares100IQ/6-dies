@@ -507,7 +507,7 @@
             <img id="camera-photo" style="
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: contain;
                 display: none;
             ">
             <div id="camera-placeholder" style="
@@ -540,7 +540,10 @@
         <p id="mobile-message" style="display: none;">te he pillat te he dit que en el movil no</p>
         <iframe id="spongebob-iframe" width="110" height="200" src="https://www.myinstants.com/instant/spongebob-sad-song-94002/embed/" frameborder="0" scrolling="no" style="display: none; margin-top: 20px;"></iframe>
         <audio id="camera-sound" preload="auto">
-            <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU" type="audio/wav">
+            <source src="camera_fotos.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="spongebob-sound" preload="auto">
+            <source src="spongebob-sad-song.mp3" type="audio/mpeg">
         </audio>
     </div>
     
@@ -947,27 +950,10 @@
         const mobileTitle = document.getElementById('mobile-title');
         const mobileMessage = document.getElementById('mobile-message');
         const spongebobIframe = document.getElementById('spongebob-iframe');
+        const cameraSound = document.getElementById('camera-sound');
+        const spongebobSound = document.getElementById('spongebob-sound');
         
         let stream = null;
-        
-        // Generar sonido de cámara con Web Audio API
-        function playCameraSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
-        }
         
         // Activar cámara automáticamente en móvil
         async function initCamera() {
@@ -1011,14 +997,23 @@
                 stream.getTracks().forEach(track => track.stop());
             }
             
-            // Reproducir sonido de cámara
-            playCameraSound();
+            // Reproducir sonido de cámara con volumen máximo
+            cameraSound.volume = 1.0;
+            cameraSound.currentTime = 0;
+            cameraSound.play().catch(e => console.error('Error al reproducir sonido de cámara:', e));
             
             // Mostrar el mensaje
             mobileTitle.style.display = 'block';
             mobileMessage.style.display = 'block';
             
-            // Mostrar iframe de SpongeBob inmediatamente después
+            // Reproducir canción de Bob Esponja con volumen máximo después del sonido de cámara
+            setTimeout(() => {
+                spongebobSound.volume = 1.0;
+                spongebobSound.currentTime = 0;
+                spongebobSound.play().catch(e => console.error('Error al reproducir canción de Bob Esponja:', e));
+            }, 500);
+            
+            // Mostrar iframe de SpongeBob
             setTimeout(() => {
                 spongebobIframe.style.display = 'block';
             }, 100);
