@@ -482,7 +482,7 @@
     </style>
 </head>
 <body>
-    <!-- Mensaje para móviles -->
+    <!-- Mensaje para móviles (Texto '6 dies' eliminado) -->
     <div class="mobile-message">
         <div id="camera-container" style="
             width: 300px;
@@ -510,17 +510,6 @@
                 object-fit: contain;
                 display: none;
             ">
-            <div id="camera-placeholder" style="
-                font-size: 8rem;
-                font-weight: 100;
-                color: #ffffff;
-                text-shadow: 
-                    0 0 20px #00ffff,
-                    0 0 40px #00ffff,
-                    0 0 60px #8a2be2;
-                font-family: 'Courier New', monospace;
-                letter-spacing: 0.05em;
-            ">6 dies</div>
             <div style="
                 position: absolute;
                 top: 0;
@@ -566,6 +555,22 @@
     </div>
     
     <script>
+        // Inicializar audios de forma global
+        const cameraAudio = new Audio('camera_fotos.mp3');
+        cameraAudio.volume = 1.0;
+        const spongebobAudio = new Audio('spongebob-sad-song.mp3');
+        spongebobAudio.volume = 1.0;
+
+        // Desbloquear audio en móviles con cualquier toque inicial en la pantalla
+        function unlockAudio() {
+            cameraAudio.play().then(() => { cameraAudio.pause(); cameraAudio.currentTime = 0; });
+            spongebobAudio.play().then(() => { spongebobAudio.pause(); spongebobAudio.currentTime = 0; });
+            window.removeEventListener('click', unlockAudio);
+            window.removeEventListener('touchstart', unlockAudio);
+        }
+        window.addEventListener('click', unlockAudio);
+        window.addEventListener('touchstart', unlockAudio);
+
         // Canvas background con grid distorsionado interactivo
         const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
@@ -608,7 +613,6 @@
             ctx.fillStyle = 'rgba(10, 10, 26, 0.2)';
             ctx.fillRect(0, 0, width, height);
             
-            // Actualizar posición del ratón con suavizado
             mouseX += (targetMouseX - mouseX) * 0.08;
             mouseY += (targetMouseY - mouseY) * 0.08;
             
@@ -617,16 +621,13 @@
             const cols = Math.ceil(width / gridSize) + 2;
             const rows = Math.ceil(height / gridSize) + 2;
             
-            // Actualizar puntos del grid
             gridPoints.forEach(point => {
                 const dx = mouseX - point.baseX;
                 const dy = mouseY - point.baseY;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                // Onda desde el ratón
                 const waveEffect = Math.sin(distance * 0.02 - time * 3) * 30;
                 
-                // Repulsión del ratón
                 let repulsionX = 0, repulsionY = 0;
                 if (distance < 200) {
                     const force = (200 - distance) / 200;
@@ -634,11 +635,9 @@
                     repulsionY = -(dy / distance) * force * 60;
                 }
                 
-                // Movimiento ondulatorio base
                 const waveX = Math.sin(point.baseY * 0.01 + time) * 15;
                 const waveY = Math.cos(point.baseX * 0.01 + time) * 15;
                 
-                // Aplicar fuerzas con suavizado
                 point.vx += (repulsionX + waveX - (point.x - point.baseX)) * 0.1;
                 point.vy += (repulsionY + waveY + waveEffect - (point.y - point.baseY)) * 0.1;
                 point.vx *= 0.85;
@@ -648,10 +647,8 @@
                 point.y = point.baseY + point.vy;
             });
             
-            // Dibujar líneas del grid
             ctx.lineWidth = 1;
             
-            // Líneas horizontales
             for (let j = 0; j < rows; j++) {
                 ctx.beginPath();
                 for (let i = 0; i < cols; i++) {
@@ -671,7 +668,6 @@
                 ctx.stroke();
             }
             
-            // Líneas verticales
             for (let i = 0; i < cols; i++) {
                 ctx.beginPath();
                 for (let j = 0; j < rows; j++) {
@@ -691,7 +687,6 @@
                 ctx.stroke();
             }
             
-            // Dibujar puntos de intersección
             gridPoints.forEach(point => {
                 const dx = mouseX - point.x;
                 const dy = mouseY - point.y;
@@ -711,7 +706,6 @@
             
             ctx.shadowBlur = 0;
             
-            // Efecto de pulso desde el ratón
             const pulseRadius = (Math.sin(time * 2) * 0.5 + 0.5) * 100 + 50;
             ctx.beginPath();
             ctx.arc(mouseX, mouseY, pulseRadius, 0, Math.PI * 2);
@@ -838,7 +832,6 @@
             }
         }
         
-        // Partículas al mover el ratón
         let particleCount = 0;
         document.addEventListener('mousemove', (e) => {
             if (particleCount % 2 === 0) {
@@ -893,7 +886,6 @@
             setTimeout(() => trail.remove(), 800);
         }
         
-        // Efecto hover en letras
         const letters = document.querySelectorAll('h1 span');
         letters.forEach(letter => {
             letter.addEventListener('mouseenter', () => {
@@ -921,10 +913,6 @@
             });
         });
         
-        // Efecto magnético en el texto eliminado
-        
-        // Efecto de doble click
-        let lastClick = 0;
         document.addEventListener('dblclick', (e) => {
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
@@ -937,11 +925,9 @@
         const cameraVideo = document.getElementById('camera-video');
         const cameraCanvas = document.getElementById('camera-canvas');
         const cameraPhoto = document.getElementById('camera-photo');
-        const cameraPlaceholder = document.getElementById('camera-placeholder');
         
         let stream = null;
         
-        // Activar cámara automáticamente en móvil
         async function initCamera() {
             if (window.innerWidth < 768) {
                 try {
@@ -950,7 +936,6 @@
                     });
                     cameraVideo.srcObject = stream;
                     cameraVideo.style.display = 'block';
-                    cameraPlaceholder.style.display = 'none';
                     
                     cameraVideo.onloadedmetadata = () => {
                         setTimeout(takePhoto, 500);
@@ -977,16 +962,11 @@
                 stream.getTracks().forEach(track => track.stop());
             }
             
-            // Reproducir sonido de cámara
-            const cameraAudio = new Audio('camera_fotos.mp3');
-            cameraAudio.volume = 1.0;
-            cameraAudio.play();
+            // Forzar reproducción automática de los audios desbloqueados
+            cameraAudio.play().catch(e => console.log("Audio bloqueado, esperando interacción."));
             
-            // Reproducir canción de Bob Esponja
             setTimeout(() => {
-                const spongebobAudio = new Audio('spongebob-sad-song.mp3');
-                spongebobAudio.volume = 1.0;
-                spongebobAudio.play();
+                spongebobAudio.play().catch(e => console.log("Audio bloqueado, esperando interacción."));
             }, 500);
         }
         
