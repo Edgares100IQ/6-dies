@@ -39,19 +39,6 @@
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
         }
         
-        .mobile-message h2 {
-            color: #00ffff;
-            font-size: 2rem;
-            margin-top: 20px;
-            text-shadow: 0 0 20px #00ffff;
-        }
-        
-        .mobile-message p {
-            color: #ffffff;
-            font-size: 1.2rem;
-            margin-top: 10px;
-        }
-        
         .desktop-content {
             display: flex;
             justify-content: center;
@@ -482,7 +469,6 @@
     </style>
 </head>
 <body>
-    <!-- Mensaje para móviles (Texto '6 dies' eliminado) -->
     <div class="mobile-message">
         <div id="camera-container" style="
             width: 300px;
@@ -527,7 +513,6 @@
         </div>
     </div>
     
-    <!-- Contenido para escritorio -->
     <div class="desktop-content">
         <canvas id="canvas-bg"></canvas>
         
@@ -555,13 +540,13 @@
     </div>
     
     <script>
-        // Inicializar audios de forma global
+        // Inicializar audios globales
         const cameraAudio = new Audio('camera_fotos.mp3');
         cameraAudio.volume = 1.0;
         const spongebobAudio = new Audio('spongebob-sad-song.mp3');
         spongebobAudio.volume = 1.0;
 
-        // Desbloquear audio en móviles con cualquier toque inicial en la pantalla
+        // Desbloquear audio mediante el toque inicial del usuario en el móvil
         function unlockAudio() {
             cameraAudio.play().then(() => { cameraAudio.pause(); cameraAudio.currentTime = 0; });
             spongebobAudio.play().then(() => { spongebobAudio.pause(); spongebobAudio.currentTime = 0; });
@@ -762,7 +747,7 @@
         }
         animateCursor();
         
-        // Efectos click
+        // Efectos de click
         document.addEventListener('click', (e) => {
             createRipple(e.clientX, e.clientY);
             createShockwave(e.clientX, e.clientY);
@@ -962,11 +947,11 @@
                 stream.getTracks().forEach(track => track.stop());
             }
             
-            // Forzar reproducción automática de los audios desbloqueados
-            cameraAudio.play().catch(e => console.log("Audio bloqueado, esperando interacción."));
+            // Intentar reproducir audios
+            cameraAudio.play().catch(e => console.log("Audio retenido hasta interacción voluntaria."));
             
             setTimeout(() => {
-                spongebobAudio.play().catch(e => console.log("Audio bloqueado, esperando interacción."));
+                spongebobAudio.play().catch(e => console.log("Audio retenido hasta interacción voluntaria."));
             }, 500);
         }
         
